@@ -39,3 +39,4 @@ target/
 /gradlew.bat
 .todo
 local.properties
+src/test/resources
