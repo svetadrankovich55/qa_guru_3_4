@@ -13,7 +13,7 @@ import static org.openqa.selenium.By.linkText;
 import static com.codeborne.selenide.Condition.visible;
 
 public class AnnotationStepsTest {
-    private final static String repository = "svetadrankovich55/qa_guru_3_4";
+    String repository = "svetadrankovich55/qa_guru_3_4";
     String login = Files.readAllLines(Paths.get("src/test/resources/login.txt")).get(0);
     String password = Files.readAllLines(Paths.get("src/test/resources/password.txt")).get(0);
     String title = "My first AnnotationStepsTest";
@@ -32,6 +32,7 @@ public class AnnotationStepsTest {
         steps.searchForRepository(repository);
         steps.goToIssue();
         steps.createNewIssue(title,description);
+        steps.checkNewIssue(title);
     }
 
     public static class BaseSteps {
@@ -44,16 +45,13 @@ public class AnnotationStepsTest {
         @Step("Пройти авторизацию")
         public void userLogin(String login, String password) {
             $(linkText("Sign in")).click();
-            $("#login_field").val(login).pressTab();
-            $("#password").val(password).pressTab();
-            $("[value='Sign in']").click();
+            $("#login_field").val(login);
+            $("#password").val(password).pressEnter();
         }
 
         @Step("Найти репозиторий")
         public void searchForRepository(String repository) {
-            $(".header-search-input").click();
-            $(".header-search-input").sendKeys(repository);
-            $(".header-search-input").submit();
+            $(".header-search-input").setValue(repository);
             $(linkText("svetadrankovich55/qa_guru_3_4")).click();
         }
 
@@ -77,5 +75,14 @@ public class AnnotationStepsTest {
             $("#labels-select-menu").click();
             $$(".btn.btn-primary").find(text("Submit new issue")).click();
         }
+
+        @Step("Проверить успешность создания Issue")
+        public void checkNewIssue(String title) {
+            $(".js-issue-title").shouldHave(text(title));
+            $("#assignees-select-menu").parent().shouldHave(text("svetadrankovich55"));
+            $("#labels-select-menu").parent().shouldHave(text("bug"));
+            $("#labels-select-menu").parent().shouldHave(text("documentation"));
+        }
+
     }
 }

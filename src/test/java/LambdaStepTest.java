@@ -13,7 +13,7 @@ import static org.openqa.selenium.By.linkText;
 import static com.codeborne.selenide.Condition.visible;
 
 public class LambdaStepTest {
-    private final static String repository = "svetadrankovich55/qa_guru_3_4";
+    String repository = "svetadrankovich55/qa_guru_3_4";
     String login = Files.readAllLines(Paths.get("src/test/resources/login.txt")).get(0);
     String password = Files.readAllLines(Paths.get("src/test/resources/password.txt")).get(0);
     String title = "My first LambdaStepTest";
@@ -26,27 +26,20 @@ public class LambdaStepTest {
     public void lambdaStepTest() {
         Configuration.browserSize = "1900x1200";
 
-        step("Открыть главную страницу", () -> {
-            open("https://github.com");
-        });
+        step("Открыть главную страницу", () -> open("https://github.com"));
 
         step("Пройти авторизацию", () -> {
             $(linkText("Sign in")).click();
-            $("#login_field").val(login).pressTab();
-            $("#password").val(password).pressTab();
-            $("[value='Sign in']").click();
+            $("#login_field").val(login);
+            $("#password").val(password).pressEnter();
         });
 
         step("Найти репозиторий", () -> {
-            $(".header-search-input").click();
-            $(".header-search-input").sendKeys(repository);
-            $(".header-search-input").submit();
+            $(".header-search-input").setValue(repository);
             $(linkText("svetadrankovich55/qa_guru_3_4")).click();
         });
 
-        step("Перейти на вкладку Issues", () -> {
-            $("[data-content=Issues]").click();
-        });
+        step("Перейти на вкладку Issues", () -> $("[data-content=Issues]").click());
 
         step("Создать новое Issues", () -> {
             $("[data-content='Issues']").click();
@@ -61,6 +54,13 @@ public class LambdaStepTest {
             $$(".name").find(text("documentation")).click();
             $("#labels-select-menu").click();
             $$(".btn.btn-primary").find(text("Submit new issue")).click();
+        });
+
+        step("Проверить успешность создания Issue", () -> {
+            $(".js-issue-title").shouldHave(text(title));
+            $("#assignees-select-menu").parent().shouldHave(text("svetadrankovich55"));
+            $("#labels-select-menu").parent().shouldHave(text("bug"));
+            $("#labels-select-menu").parent().shouldHave(text("documentation"));
         });
 
     }
